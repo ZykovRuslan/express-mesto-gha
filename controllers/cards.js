@@ -1,6 +1,6 @@
 import { constants as http2Constants } from 'node:http2';
 import mongoose from 'mongoose';
-import Card from '../models/card';
+import Card from '../models/card.js';
 
 function errorHandler(error, res) {
   if (error instanceof mongoose.Error.ValidationError) {
