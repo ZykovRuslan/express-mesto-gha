@@ -1,7 +1,7 @@
 import { constants as http2Constants } from 'node:http2';
 import express from 'express';
 import mongoose from 'mongoose';
-import routes from './routes/index.js';
+import routes from './routes/index';
 
 const { PORT = 3000 } = process.env;
 
