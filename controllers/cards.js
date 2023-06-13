@@ -40,7 +40,9 @@ export const getCards = async (req, res) => {
 export const deleteCard = async (req, res) => {
   try {
     await Card.findByIdAndDelete(req.params.cardId).orFail();
-    res.status(http2Constants.HTTP_STATUS_OK).send({ message: 'Успешно удалено!' });
+    res
+      .status(http2Constants.HTTP_STATUS_OK)
+      .send({ message: 'Успешно удалено!' });
   } catch (error) {
     errorHandler(error, res);
   }
