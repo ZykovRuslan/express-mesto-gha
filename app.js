@@ -24,6 +24,10 @@ app.use((req, res, next) => {
 
 app.use(routes);
 
+app.use('*', (req, res) => {
+  res.status(404).send('Неверный путь');
+});
+
 app.listen(PORT, () => {
   console.log(`server is running on port ${PORT}`);
 });
