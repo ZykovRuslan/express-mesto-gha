@@ -42,7 +42,7 @@ const updateUserById = (req, res) => {
   const { name, about } = req.body;
   const userId = req.user._id;
 
-  User.findByIdAndUpdate(userId, { name, about }, { new: true })
+  User.findByIdAndUpdate(userId, { name, about }, { new: true, runValidators: true })
     .then((user) => {
       if (!user) {
         res.status(404).send({ message: `Пользователь по указанному id: ${userId} не найден.` });
@@ -53,7 +53,7 @@ const updateUserById = (req, res) => {
     .catch((err) => {
       if (err.name === 'ValidationError') {
         res.status(400).send({
-          message: 'Переданы некорректные данные при обновлении профиля.',
+          message: `Пожалуйста, проверьте правильность заполнения полей: ${Object.values(err.errors).map((error) => `${error.message.slice(5)}`).join(' ')}`,
         });
       } else {
         res.status(500).send({ message: 'Ошибка сервера' });
