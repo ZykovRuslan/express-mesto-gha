@@ -46,7 +46,7 @@ const likeCardById = (req, res) => {
   Card.findById(cardId)
     .then((card) => {
       if (!card) {
-        res.status(404).send({ message: `Карточка с указанным id: ${cardId} не найдена.` });
+        res.status(400).send({ message: `Карточка с указанным id: ${cardId} не найдена.` });
       } else {
         Card.findByIdAndUpdate(
           req.params.cardId,
@@ -67,7 +67,7 @@ const dislikeCardById = (req, res) => {
   Card.findById(cardId)
     .then((card) => {
       if (!card) {
-        res.status(404).send({ message: `Карточка с указанным id: ${cardId} не найдена.` });
+        res.status(400).send({ message: `Карточка с указанным id: ${cardId} не найдена.` });
       } else {
         Card.findByIdAndUpdate(
           req.params.cardId,
