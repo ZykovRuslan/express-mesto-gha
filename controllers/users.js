@@ -53,7 +53,7 @@ const updateUserById = (req, res) => {
     .catch((err) => {
       if (err.name === 'ValidationError') {
         res.status(400).send({
-          message: `Пожалуйста, проверьте правильность заполнения полей: ${Object.values(err.errors).map((error) => `${error.message.slice(5)}`).join(' ')}`,
+          message: 'Переданы некорректные данные при обновлении профиля.',
         });
       } else {
         res.status(500).send({ message: 'Ошибка сервера' });
