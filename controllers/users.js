@@ -15,8 +15,8 @@ const getUserById = (req, res) => {
         res.status(200).send(user);
       }
     })
-    .catch(() => {
-      res.status(500).send({ message: 'Ошибка сервера' });
+    .catch((err) => {
+      console.error(err);
     });
 };
 
