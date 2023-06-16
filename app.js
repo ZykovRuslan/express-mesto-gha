@@ -2,7 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const routes = require('./routes');
 
-const { PORT = 3000 } = process.env;
+const { PORT = 3000 } = process.env.PORT || 4000;
 
 mongoose.connect('mongodb://localhost:27017/mestodb', {
   useNewUrlParser: true,
