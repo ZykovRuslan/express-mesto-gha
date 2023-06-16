@@ -1,81 +1,87 @@
-import { constants as http2Constants } from 'node:http2';
-import mongoose from 'mongoose';
-import User from '../models/user.js';
+const User = require('../models/user');
 
-function errorHandler(error, res) {
-  if (error instanceof mongoose.Error.ValidationError) {
-    return res.status(http2Constants.HTTP_STATUS_BAD_REQUEST).send({
-      message: `${Object.values(error.errors)
-        .map((err) => err.message)
-        .join(', ')}`,
+const getUsers = (req, res) => {
+  User.find({}).then((users) => res.status(200).send(users));
+};
+
+const getUserById = (req, res) => {
+  const { userId } = req.params;
+
+  User.findById(userId)
+    .then((user) => {
+      if (!user) {
+        res.status(404).send({ message: `Пользователь по указанному id: ${userId} не найден.` });
+      } else {
+        res.status(200).send(user);
+      }
+    })
+    .catch(() => {
+      res.status(500).send({ message: 'Ошибка сервера' });
     });
-  }
+};
 
-  if (error instanceof mongoose.Error.DocumentNotFoundError) {
-    return res.status(http2Constants.HTTP_STATUS_NOT_FOUND).send({
-      message: 'Запрашиваемая карточка не найдена',
+const createUser = (req, res) => {
+  const newUserData = req.body;
+
+  User.create(newUserData)
+    .then((newUser) => {
+      res.status(201).send(newUser);
+    })
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        res.status(400).send({
+          message: `Пожалуйста, проверьте правильность заполнения полей: ${Object.values(err.errors).map((error) => `${error.message.slice(5)}`).join(' ')}`,
+        });
+      } else {
+        res.status(500).send({ message: 'Ошибка сервера' });
+      }
     });
-  }
+};
 
-  if (error instanceof mongoose.Error.CastError) {
-    return res.status(http2Constants.HTTP_STATUS_BAD_REQUEST).send({
-      message: 'Некорректный id',
+const updateUserById = (req, res) => {
+  const { name, about } = req.body;
+  const userId = req.user._id;
+
+  User.findByIdAndUpdate(userId, { name, about })
+    .then((user) => {
+      if (!user) {
+        res.status(404).send({ message: `Пользователь по указанному id: ${userId} не найден.` });
+      } else {
+        res.status(200).send(user);
+      }
+    })
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        res.status(400).send({
+          message: `Пожалуйста, проверьте правильность заполнения полей: ${Object.values(err.errors).map((error) => `${error.message.slice(5)}`).join(' ')}`,
+        });
+      } else {
+        res.status(500).send({ message: 'Ошибка сервера' });
+      }
     });
-  }
-
-  return res
-    .status(http2Constants.HTTP_STATUS_INTERNAL_SERVER_ERROR)
-    .send({ message: 'Server Error' });
-}
-
-export const getUsers = async (req, res) => {
-  try {
-    const allUsers = await User.find({});
-    res.status(http2Constants.HTTP_STATUS_OK).send(allUsers);
-  } catch (error) {
-    errorHandler(error, res);
-  }
 };
 
-export const getUserById = async (req, res) => {
-  try {
-    const user = await User.findById(req.params.userId).orFail();
-    res.status(http2Constants.HTTP_STATUS_OK).send(user);
-  } catch (error) {
-    errorHandler(error, res);
-  }
-};
+const updateAvatarById = (req, res) => {
+  const { avatar } = req.body;
+  const userId = req.user._id;
 
-export const createUser = async (req, res) => {
-  try {
-    const newUser = req.body;
-    const user = await User.create(newUser);
-    res.status(http2Constants.HTTP_STATUS_CREATED).send(user);
-  } catch (error) {
-    errorHandler(error, res);
-  }
-};
-
-const updateData = async (req, res, varibles) => {
-  try {
-    const newData = {};
-    varibles.forEach((item) => {
-      newData[item] = req.body[item];
+  User.findByIdAndUpdate(userId, { avatar })
+    .then((user) => {
+      if (!user) {
+        res.status(404).send({ message: `Пользователь по указанному id: ${userId} не найден.` });
+      } else {
+        res.status(200).send(user);
+      }
+    })
+    .catch((err) => {
+      console.log(err);
     });
-    const updatedUser = await User.findByIdAndUpdate(req.user._id, newData, {
-      new: true,
-      runValidators: true,
-    }).orFail();
-    res.status(http2Constants.HTTP_STATUS_OK).send(updatedUser);
-  } catch (error) {
-    errorHandler(error, res);
-  }
 };
 
-export const updateUser = async (req, res) => {
-  await updateData(req, res, ['name', 'about']);
-};
-
-export const updateAvatar = async (req, res) => {
-  await updateData(req, res, ['avatar']);
+module.exports = {
+  getUsers,
+  getUserById,
+  createUser,
+  updateUserById,
+  updateAvatarById,
 };

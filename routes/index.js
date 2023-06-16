@@ -1,10 +1,8 @@
-import { Router } from 'express';
-import usersRouter from './users.js';
-import cardsRouter from './cards.js';
+const router = require('express').Router();
+const userRoutes = require('./users');
+const cardRoutes = require('./cards');
 
-const router = Router();
+router.use('/users', userRoutes);
+router.use('/cards', cardRoutes);
 
-router.use('/users', usersRouter);
-router.use('/cards', cardsRouter);
-
-export default router;
+module.exports = router;

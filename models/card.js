@@ -1,6 +1,7 @@
-import mongoose from 'mongoose';
+const mangoose = require('mongoose');
+const { Schema } = require('mongoose');
 
-const cardSchema = new mongoose.Schema({
+const cardSchema = new Schema({
   name: {
     type: String,
     minlength: 2,
@@ -12,15 +13,15 @@ const cardSchema = new mongoose.Schema({
     required: true,
   },
   owner: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'user',
+    type: Schema.Types.ObjectId,
+    reference: 'user',
     required: true,
   },
   likes: {
     type: [
       {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'user',
+        type: Schema.Types.ObjectId,
+        reference: 'user',
       },
     ],
     default: [],
@@ -31,4 +32,4 @@ const cardSchema = new mongoose.Schema({
   },
 });
 
-export default mongoose.model('card', cardSchema);
+module.exports = mangoose.model('card', cardSchema);
