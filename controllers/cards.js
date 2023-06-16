@@ -36,7 +36,7 @@ const deleteCardById = (req, res) => {
       }
     })
     .catch(() => {
-      res.status(500).send({ message: 'Ошибка сервера' });
+      res.status(400).send({ message: `Карточка с указанным id: ${cardId} не существует в базе данных.` });
     });
 };
 
