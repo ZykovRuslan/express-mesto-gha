@@ -42,7 +42,7 @@ const updateUserById = (req, res) => {
   const { name, about } = req.body;
   const userId = req.user._id;
 
-  User.findByIdAndUpdate(userId, { name, about })
+  User.findByIdAndUpdate(userId, { name, about }, { new: true })
     .then((user) => {
       if (!user) {
         res.status(404).send({ message: `Пользователь по указанному id: ${userId} не найден.` });
