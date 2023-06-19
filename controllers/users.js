@@ -37,7 +37,7 @@ const createUser = (req, res) => {
           message: `Пожалуйста, проверьте правильность заполнения полей: ${Object.values(err.errors).map((error) => `${error.message.slice(5)}`).join(' ')}`,
         });
       } else {
-        res.status(http2.constants.NTERNAL_SERVER_ERROR).send({ message: 'Ошибка сервера' });
+        res.status(http2.constants.INTERNAL_SERVER_ERROR).send({ message: 'Ошибка сервера' });
       }
     });
 };
@@ -60,7 +60,7 @@ const updateUserById = (req, res) => {
           message: `Пожалуйста, проверьте правильность заполнения полей: ${Object.values(err.errors).map((error) => `${error.message.slice(5)}`).join(' ')}`,
         });
       } else {
-        res.status(http2.constants.NTERNAL_SERVER_ERROR).send({ message: 'Ошибка сервера' });
+        res.status(http2.constants.INTERNAL_SERVER_ERROR).send({ message: 'Ошибка сервера.' });
       }
     });
 };
