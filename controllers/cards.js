@@ -3,7 +3,7 @@ const Card = require('../models/card');
 
 const getCards = (req, res) => {
   Card.find({})
-    .then((cards) => res.status(http2.constants.OK).send(cards))
+    .then((cards) => res.status(http2.constants.HTTP_STATUS_OK).send(cards))
     .catch(() => {
       res.status(http2.constants.HTTP_STATUS_INTERNAL_SERVER_ERROR).send({ message: 'Ошибка сервера.' });
     });
