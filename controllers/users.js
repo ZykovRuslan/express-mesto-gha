@@ -1,7 +1,9 @@
 const User = require('../models/user');
 
 const getUsers = (req, res) => {
-  User.find({}).then((users) => res.status(200).send(users));
+  User.find({}).then((users) => res.status(200).send(users)).catch((err) => {
+    console.log(err);
+  });
 };
 
 const getUserById = (req, res) => {
@@ -65,7 +67,7 @@ const updateAvatarById = (req, res) => {
   const { avatar } = req.body;
   const userId = req.user._id;
 
-  User.findByIdAndUpdate(userId, { avatar }, { new: true })
+  User.findByIdAndUpdate(userId, { avatar }, { new: true, runValidators: true })
     .then((user) => {
       if (!user) {
         res.status(404).send({ message: `Пользователь по указанному id: ${userId} не найден.` });
