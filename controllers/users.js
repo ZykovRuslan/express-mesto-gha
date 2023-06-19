@@ -1,9 +1,11 @@
+const http2 = require('http2');
 const User = require('../models/user');
 
 const getUsers = (req, res) => {
-  User.find({}).then((users) => res.status(200).send(users)).catch((err) => {
-    console.log(err);
-  });
+  User.find({}).then((users) => res.status(http2.constants.OK).send(users))
+    .catch(() => {
+      res.status(http2.constants.INTERNAL_SERVER_ERROR).send({ message: 'Ошибка сервера.' });
+    });
 };
 
 const getUserById = (req, res) => {
@@ -12,13 +14,13 @@ const getUserById = (req, res) => {
   User.findById(userId)
     .then((user) => {
       if (!user) {
-        res.status(404).send({ message: `Пользователь по указанному id: ${userId} не найден.` });
+        res.status(http2.constants.NOT_FOUND).send({ message: `Пользователь по указанному id: ${userId} не найден.` });
       } else {
-        res.status(200).send(user);
+        res.status(http2.constants.OK).send(user);
       }
     })
     .catch(() => {
-      res.status(400).send({ message: `Получение пользователя с некорректным id: ${userId}` });
+      res.status(http2.constants.BAD_REQUEST).send({ message: `Получение пользователя с некорректным id: ${userId}` });
     });
 };
 
@@ -27,15 +29,15 @@ const createUser = (req, res) => {
 
   User.create(newUserData)
     .then((newUser) => {
-      res.status(201).send(newUser);
+      res.status(http2.constants.CREATED).send(newUser);
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(400).send({
+        res.status(http2.constants.BAD_REQUEST).send({
           message: `Пожалуйста, проверьте правильность заполнения полей: ${Object.values(err.errors).map((error) => `${error.message.slice(5)}`).join(' ')}`,
         });
       } else {
-        res.status(500).send({ message: 'Ошибка сервера' });
+        res.status(http2.constants.NTERNAL_SERVER_ERROR).send({ message: 'Ошибка сервера' });
       }
     });
 };
@@ -47,18 +49,18 @@ const updateUserById = (req, res) => {
   User.findByIdAndUpdate(userId, { name, about }, { new: true, runValidators: true })
     .then((user) => {
       if (!user) {
-        res.status(404).send({ message: `Пользователь по указанному id: ${userId} не найден.` });
+        res.status(http2.constants.NOT_FOUND).send({ message: `Пользователь по указанному id: ${userId} не найден.` });
       } else {
-        res.status(200).send(user);
+        res.status(http2.constants.OK).send(user);
       }
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(400).send({
+        res.status(http2.constants.BAD_REQUEST).send({
           message: `Пожалуйста, проверьте правильность заполнения полей: ${Object.values(err.errors).map((error) => `${error.message.slice(5)}`).join(' ')}`,
         });
       } else {
-        res.status(500).send({ message: 'Ошибка сервера' });
+        res.status(http2.constants.NTERNAL_SERVER_ERROR).send({ message: 'Ошибка сервера' });
       }
     });
 };
@@ -70,13 +72,13 @@ const updateAvatarById = (req, res) => {
   User.findByIdAndUpdate(userId, { avatar }, { new: true, runValidators: true })
     .then((user) => {
       if (!user) {
-        res.status(404).send({ message: `Пользователь по указанному id: ${userId} не найден.` });
+        res.status(http2.constants.NOT_FOUND).send({ message: `Пользователь по указанному id: ${userId} не найден.` });
       } else {
-        res.status(200).send(user);
+        res.status(http2.constants.OK).send(user);
       }
     })
-    .catch((err) => {
-      console.log(err);
+    .catch(() => {
+      res.status(http2.constants.INTERNAL_SERVER_ERROR).send({ message: 'Ошибка сервера.' });
     });
 };
 

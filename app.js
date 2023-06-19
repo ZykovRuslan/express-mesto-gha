@@ -1,5 +1,6 @@
 const express = require('express');
 const mongoose = require('mongoose');
+const http2 = require('http2');
 const routes = require('./routes');
 
 const { PORT = 3000 } = process.env.PORT || 4000;
@@ -25,7 +26,7 @@ app.use((req, res, next) => {
 app.use(routes);
 
 app.use('*', (req, res) => {
-  res.status(404).json({ message: 'Неверный путь' });
+  res.status(http2.constants.NOT_FOUND).json({ message: 'Неверный путь' });
 });
 
 app.listen(PORT, () => {
