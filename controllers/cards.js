@@ -51,7 +51,7 @@ const likeCardById = (req, res) => {
   Card.findById(cardId)
     .then((card) => {
       if (!card) {
-        res.status(http2.constants.HTTP_STATUS_BAD_REQUEST).send({ message: `Карточка с указанным id: ${cardId} не найдена.` });
+        res.status(http2.constants.HTTP_STATUS_NOT_FOUND).send({ message: `Карточка с указанным id: ${cardId} не найдена.` });
       } else {
         Card.findByIdAndUpdate(
           req.params.cardId,
