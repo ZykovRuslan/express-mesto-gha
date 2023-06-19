@@ -26,7 +26,7 @@ app.use((req, res, next) => {
 app.use(routes);
 
 app.use('*', (req, res) => {
-  res.status(http2.constants.NOT_FOUND).json({ message: 'Неверный путь' });
+  res.status(http2.constants.HTTP_STATUS_NOT_FOUND).json({ message: 'Неверный путь' });
 });
 
 app.listen(PORT, () => {
