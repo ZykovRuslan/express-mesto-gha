@@ -19,8 +19,12 @@ const getUserById = (req, res) => {
         res.status(http2.constants.HTTP_STATUS_OK).send(user);
       }
     })
-    .catch(() => {
-      res.status(http2.constants.HTTP_STATUS_INTERNAL_SERVER_ERROR).send({ message: 'Ошибка сервера.' });
+    .catch((error) => {
+      if (error.name === 'CastError') {
+        res.status(http2.constants.HTTP_STATUS_BAD_REQUEST).send({ message: `Получение пользователя с некорректным id: ${userId}.` });
+      } else {
+        res.status(http2.constants.HTTP_STATUS_INTERNAL_SERVER_ERROR).send({ message: 'Ошибка сервера.' });
+      }
     });
 };
 
