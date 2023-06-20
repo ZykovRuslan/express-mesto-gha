@@ -20,7 +20,7 @@ const getUserById = (req, res) => {
       }
     })
     .catch(() => {
-      res.status(http2.constants.HTTP_STATUS_BAD_REQUEST).send({ message: `Получение пользователя с некорректным id: ${userId}` });
+      res.status(http2.constants.HTTP_STATUS_INTERNAL_SERVER_ERROR).send({ message: 'Ошибка сервера.' });
     });
 };
 
@@ -37,7 +37,7 @@ const createUser = (req, res) => {
           message: `Пожалуйста, проверьте правильность заполнения полей: ${Object.values(err.errors).map((error) => `${error.message.slice(5)}`).join(' ')}`,
         });
       } else {
-        res.status(http2.constants.HTTP_STATUS_INTERNAL_SERVER_ERROR).send({ message: 'Ошибка сервера' });
+        res.status(http2.constants.HTTP_STATUS_INTERNAL_SERVER_ERROR).send({ message: 'Ошибка сервера.' });
       }
     });
 };
@@ -77,8 +77,14 @@ const updateAvatarById = (req, res) => {
         res.status(http2.constants.HTTP_STATUS_OK).send(user);
       }
     })
-    .catch(() => {
-      res.status(http2.constants.HTTP_STATUS_INTERNAL_SERVER_ERROR).send({ message: 'Ошибка сервера.' });
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        res.status(http2.constants.HTTP_STATUS_BAD_REQUEST).send({
+          message: `Пожалуйста, проверьте правильность заполнения полей: ${Object.values(err.errors).map((error) => `${error.message.slice(5)}`).join(' ')}`,
+        });
+      } else {
+        res.status(http2.constants.HTTP_STATUS_INTERNAL_SERVER_ERROR).send({ message: 'Ошибка сервера.' });
+      }
     });
 };
 

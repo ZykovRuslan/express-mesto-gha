@@ -23,7 +23,7 @@ const createCard = (req, res) => {
           message: Object.values(err.errors).map((error) => error.message).join(', '),
         });
       } else {
-        res.status(http2.constants.HTTP_STATUS_INTERNAL_SERVER_ERROR).send({ message: 'Ошибка сервера' });
+        res.status(http2.constants.HTTP_STATUS_INTERNAL_SERVER_ERROR).send({ message: 'Ошибка сервера.' });
       }
     });
 };
@@ -37,7 +37,10 @@ const deleteCardById = (req, res) => {
         res.status(http2.constants.HTTP_STATUS_NOT_FOUND).send({ message: `Карточка с указанным id: ${cardId} не найдена.` });
       } else {
         Card.findByIdAndRemove(cardId)
-          .then((removedCard) => res.status(http2.constants.HTTP_STATUS_OK).send(removedCard));
+          .then((removedCard) => res.status(http2.constants.HTTP_STATUS_OK).send(removedCard))
+          .catch(() => {
+            res.status(http2.constants.HTTP_STATUS_INTERNAL_SERVER_ERROR).send({ message: 'Ошибка сервера.' });
+          });
       }
     })
     .catch(() => {
@@ -58,7 +61,10 @@ const likeCardById = (req, res) => {
           { $addToSet: { likes: req.user._id } }, // добавить _id в массив, если его там нет
           { new: true },
         )
-          .then((removedCard) => res.status(http2.constants.HTTP_STATUS_OK).send(removedCard));
+          .then((removedCard) => res.status(http2.constants.HTTP_STATUS_OK).send(removedCard))
+          .catch(() => {
+            res.status(http2.constants.HTTP_STATUS_INTERNAL_SERVER_ERROR).send({ message: 'Ошибка сервера.' });
+          });
       }
     })
     .catch(() => {
@@ -79,7 +85,10 @@ const dislikeCardById = (req, res) => {
           { $pull: { likes: req.user._id } }, // убрать _id из массива
           { new: true },
         )
-          .then((removedCard) => res.status(http2.constants.HTTP_STATUS_OK).send(removedCard));
+          .then((removedCard) => res.status(http2.constants.HTTP_STATUS_OK).send(removedCard))
+          .catch(() => {
+            res.status(http2.constants.HTTP_STATUS_INTERNAL_SERVER_ERROR).send({ message: 'Ошибка сервера.' });
+          });
       }
     })
     .catch(() => {
