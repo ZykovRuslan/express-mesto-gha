@@ -43,8 +43,12 @@ const deleteCardById = (req, res) => {
           });
       }
     })
-    .catch(() => {
-      res.status(http2.constants.HTTP_STATUS_BAD_REQUEST).send({ message: `Карточка с указанным id: ${cardId} не существует в базе данных.` });
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        res.status(http2.constants.HTTP_STATUS_BAD_REQUEST).send({ message: `Карточка с указанным id: ${cardId} не существует в базе данных.` });
+      } else {
+        res.status(http2.constants.HTTP_STATUS_INTERNAL_SERVER_ERROR).send({ message: 'Ошибка сервера.' });
+      }
     });
 };
 
@@ -67,8 +71,12 @@ const likeCardById = (req, res) => {
           });
       }
     })
-    .catch(() => {
-      res.status(http2.constants.HTTP_STATUS_BAD_REQUEST).send({ message: `Карточка с указанным id: ${cardId} не существует в базе данных.` });
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        res.status(http2.constants.HTTP_STATUS_BAD_REQUEST).send({ message: `Карточка с указанным id: ${cardId} не существует в базе данных.` });
+      } else {
+        res.status(http2.constants.HTTP_STATUS_INTERNAL_SERVER_ERROR).send({ message: 'Ошибка сервера.' });
+      }
     });
 };
 
@@ -91,8 +99,12 @@ const dislikeCardById = (req, res) => {
           });
       }
     })
-    .catch(() => {
-      res.status(http2.constants.HTTP_STATUS_BAD_REQUEST).send({ message: `Карточка с указанным id: ${cardId} не существует в базе данных.` });
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        res.status(http2.constants.HTTP_STATUS_BAD_REQUEST).send({ message: `Карточка с указанным id: ${cardId} не существует в базе данных.` });
+      } else {
+        res.status(http2.constants.HTTP_STATUS_INTERNAL_SERVER_ERROR).send({ message: 'Ошибка сервера.' });
+      }
     });
 };
 
