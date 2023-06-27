@@ -28,7 +28,8 @@ const createCard = (req, res, next) => {
       } else {
         next(error);
       }
-    });
+    })
+    .catch(next);
 };
 
 const deleteCardById = (req, res, next) => {
