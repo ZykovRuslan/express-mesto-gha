@@ -1,15 +1,19 @@
 const http2 = require('http2');
 const Card = require('../models/card');
+const BadRequestError = require('../errors/BadRequestError');
+const NotFoundError = require('../errors/NotFoundError');
+const ValidationError = require('../errors/ValidationError');
+const ForbiddenError = require('../errors/ForbiddenError');
 
-const getCards = (req, res) => {
+const getCards = (req, res, next) => {
   Card.find({})
     .then((cards) => res.status(http2.constants.HTTP_STATUS_OK).send(cards))
-    .catch(() => {
-      res.status(http2.constants.HTTP_STATUS_INTERNAL_SERVER_ERROR).send({ message: 'Ошибка сервера.' });
+    .catch((error) => {
+      next(error);
     });
 };
 
-const createCard = (req, res) => {
+const createCard = (req, res, next) => {
   const { name, link } = req.body;
   const owner = req.user._id;
 
@@ -17,48 +21,49 @@ const createCard = (req, res) => {
     .then((newCard) => {
       res.status(http2.constants.HTTP_STATUS_CREATED).send(newCard);
     })
-    .catch((err) => {
-      if (err.name === 'ValidationError') {
-        res.status(http2.constants.HTTP_STATUS_BAD_REQUEST).send({
-          message: Object.values(err.errors).map((error) => error.message).join(', '),
-        });
+    .catch((error) => {
+      if (error.name === 'ValidationError') {
+        throw new ValidationError(`Пожалуйста, проверьте правильность заполнения полей:
+        ${Object.values(error.errors).map((err) => `${err.message.slice(5)}`).join(' ')}`);
       } else {
-        res.status(http2.constants.HTTP_STATUS_INTERNAL_SERVER_ERROR).send({ message: 'Ошибка сервера.' });
+        next(error);
       }
     });
 };
 
-const deleteCardById = (req, res) => {
+const deleteCardById = (req, res, next) => {
   const { cardId } = req.params;
 
   Card.findById(cardId)
     .then((card) => {
       if (!card) {
-        res.status(http2.constants.HTTP_STATUS_NOT_FOUND).send({ message: `Карточка с указанным id: ${cardId} не найдена.` });
+        throw new NotFoundError(`Карточка с указанным id: ${cardId} не найдена.`);
+      } else if (card.owner.toString() !== req.user._id) {
+        throw new ForbiddenError('Нельзя удалить чужую карточку.');
       } else {
         Card.findByIdAndRemove(cardId)
           .then((removedCard) => res.status(http2.constants.HTTP_STATUS_OK).send(removedCard))
-          .catch(() => {
-            res.status(http2.constants.HTTP_STATUS_INTERNAL_SERVER_ERROR).send({ message: 'Ошибка сервера.' });
+          .catch((error) => {
+            next(error);
           });
       }
     })
-    .catch((err) => {
-      if (err.name === 'CastError') {
-        res.status(http2.constants.HTTP_STATUS_BAD_REQUEST).send({ message: `Карточка с указанным id: ${cardId} не существует в базе данных.` });
+    .catch((error) => {
+      if (error.name === 'CastError') {
+        throw new BadRequestError(`Карточка с указанным id: ${cardId} не существует в базе данных.`);
       } else {
-        res.status(http2.constants.HTTP_STATUS_INTERNAL_SERVER_ERROR).send({ message: 'Ошибка сервера.' });
+        next(error);
       }
     });
 };
 
-const likeCardById = (req, res) => {
+const likeCardById = (req, res, next) => {
   const { cardId } = req.params;
 
   Card.findById(cardId)
     .then((card) => {
       if (!card) {
-        res.status(http2.constants.HTTP_STATUS_NOT_FOUND).send({ message: `Карточка с указанным id: ${cardId} не найдена.` });
+        throw new NotFoundError(`Карточка с указанным id: ${cardId} не найдена.`);
       } else {
         Card.findByIdAndUpdate(
           req.params.cardId,
@@ -66,27 +71,27 @@ const likeCardById = (req, res) => {
           { new: true },
         )
           .then((removedCard) => res.status(http2.constants.HTTP_STATUS_OK).send(removedCard))
-          .catch(() => {
-            res.status(http2.constants.HTTP_STATUS_INTERNAL_SERVER_ERROR).send({ message: 'Ошибка сервера.' });
+          .catch((error) => {
+            next(error);
           });
       }
     })
-    .catch((err) => {
-      if (err.name === 'CastError') {
-        res.status(http2.constants.HTTP_STATUS_BAD_REQUEST).send({ message: `Карточка с указанным id: ${cardId} не существует в базе данных.` });
+    .catch((error) => {
+      if (error.name === 'CastError') {
+        throw new BadRequestError(`Карточка с указанным id: ${cardId} не существует в базе данных.`);
       } else {
-        res.status(http2.constants.HTTP_STATUS_INTERNAL_SERVER_ERROR).send({ message: 'Ошибка сервера.' });
+        next(error);
       }
     });
 };
 
-const dislikeCardById = (req, res) => {
+const dislikeCardById = (req, res, next) => {
   const { cardId } = req.params;
 
   Card.findById(cardId)
     .then((card) => {
       if (!card) {
-        res.status(http2.constants.HTTP_STATUS_NOT_FOUND).send({ message: `Карточка с указанным id: ${cardId} не найдена.` });
+        throw new NotFoundError(`Карточка с указанным id: ${cardId} не найдена.`);
       } else {
         Card.findByIdAndUpdate(
           req.params.cardId,
@@ -94,16 +99,16 @@ const dislikeCardById = (req, res) => {
           { new: true },
         )
           .then((removedCard) => res.status(http2.constants.HTTP_STATUS_OK).send(removedCard))
-          .catch(() => {
-            res.status(http2.constants.HTTP_STATUS_INTERNAL_SERVER_ERROR).send({ message: 'Ошибка сервера.' });
+          .catch((error) => {
+            next(error);
           });
       }
     })
-    .catch((err) => {
-      if (err.name === 'CastError') {
-        res.status(http2.constants.HTTP_STATUS_BAD_REQUEST).send({ message: `Карточка с указанным id: ${cardId} не существует в базе данных.` });
+    .catch((error) => {
+      if (error.name === 'CastError') {
+        throw new BadRequestError(`Карточка с указанным id: ${cardId} не существует в базе данных.`);
       } else {
-        res.status(http2.constants.HTTP_STATUS_INTERNAL_SERVER_ERROR).send({ message: 'Ошибка сервера.' });
+        next(error);
       }
     });
 };
