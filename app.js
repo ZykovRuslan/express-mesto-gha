@@ -1,7 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const http2 = require('http2');
-const { celebrate, Joi } = require('celebrate');
+const { celebrate, Joi, errors } = require('celebrate');
 const routes = require('./routes');
 const auth = require('./middlewares/auth');
 const { login, createUser } = require('./controllers/users');
@@ -45,15 +45,16 @@ app.post(
   createUser,
 );
 
-app.use('*', (req, res) => {
-  res.status(http2.constants.HTTP_STATUS_NOT_FOUND).json({ message: 'Неверный путь' });
-});
 // авторизация
 app.use(auth);
 
 // роуты, которым авторизация нужна
 app.use(routes);
+app.use('*', (req, res) => {
+  res.status(http2.constants.HTTP_STATUS_NOT_FOUND).json({ message: 'Неверный путь' });
+});
 
+app.use(errors());
 app.use(handleError);
 
 app.listen(PORT, () => {
