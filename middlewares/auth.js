@@ -1,11 +1,11 @@
-const http2 = require('http2');
 const jwt = require('jsonwebtoken');
+const UnauthorizedError = require('../errors/UnauthorizedError');
 
 const auth = (req, res, next) => {
   const { authorization } = req.headers;
 
   if (!authorization || !authorization.startsWith('Bearer ')) {
-    res.status(http2.constants.UNAUTHORIZED).send({ message: 'Необходима авторизация' });
+    throw new UnauthorizedError('Необходима авторизация');
   }
 
   const token = authorization.replace('Bearer ', '');
@@ -16,7 +16,7 @@ const auth = (req, res, next) => {
     payload = jwt.verify(token, 'unique-secret-key');
   } catch (err) {
     // отправим ошибку, если не получилось
-    res.status(http2.constants.UNAUTHORIZED).send({ message: 'Необходима авторизация' });
+    throw new UnauthorizedError('Необходима авторизация');
   }
   req.user = payload; // записываем пейлоуд в объект запроса
 
