@@ -37,7 +37,7 @@ app.post(
     body: Joi.object().keys({
       name: Joi.string().min(2).max(30),
       about: Joi.string().min(2).max(20),
-      avatar: Joi.string().regex(/https?:\/\/(www.)?[\da-z\-._~:/?#[\]@!$&'()*+,;=]+#?$/i),
+      avatar: Joi.string().regex(/https?:\/\/(www)?[\da-z\-._~:/?#[\]@!$&'()*+,;=]+#?$/i),
       email: Joi.string().required().email(),
       password: Joi.string().required(),
     }),
