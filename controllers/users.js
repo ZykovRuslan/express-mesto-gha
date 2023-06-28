@@ -11,19 +11,19 @@ const ValidationError = require('../errors/ValidationError');
 const SALT_ROUNDS = 10;
 const JWT_SECRET = 'unique-secret-key';
 
-function verifyToken(token) {
-  return jwt.verify(token, JWT_SECRET, (err, decoded) => {
-    if (err) return false;
-    return User.findById(decoded.id)
-      .then((user) => Boolean(user));
-  });
-}
+// function verifyToken(token) {
+//   return jwt.verify(token, JWT_SECRET, (err, decoded) => {
+//     if (err) return false;
+//     return User.findById(decoded.id)
+//       .then((user) => Boolean(user));
+//   });
+// }
 
 const getUsers = (req, res, next) => {
-  const token = req.headers.authorization;
-  if (!verifyToken(token)) {
-    throw new UnauthorizedError('Ошибка авторизации.');
-  }
+  // const token = req.headers.authorization;
+  // if (!verifyToken(token)) {
+  //   throw new UnauthorizedError('Ошибка авторизации.');
+  // }
   User.find({}).then((users) => res.status(http2.constants.HTTP_STATUS_OK).send(users))
     .catch((error) => {
       next(error);
