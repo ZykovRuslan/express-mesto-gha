@@ -18,6 +18,8 @@ mongoose.connect(DB_URL, {
 
 const app = express();
 
+app.use(requestLogger); // подключаем логгер запросов
+
 app.use(helmet());
 
 const limiter = rateLimit({
@@ -31,8 +33,6 @@ const limiter = rateLimit({
 app.use(limiter);
 
 app.use(express.json());
-
-app.use(requestLogger); // подключаем логгер запросов
 
 app.use(routes);
 
