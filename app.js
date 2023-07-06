@@ -4,6 +4,7 @@ const { errors } = require('celebrate');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const routes = require('./routes');
+const { requestLogger, errorLogger } = require('./middlewares/logger');
 const handleError = require('./middlewares/handleError');
 const NotFoundError = require('./errors/NotFoundError');
 
@@ -31,13 +32,16 @@ app.use(limiter);
 
 app.use(express.json());
 
+app.use(requestLogger); // подключаем логгер запросов
+
 app.use(routes);
 
 app.use('*', (req, res, next) => {
   next(new NotFoundError('Маршрут не найден'));
 });
 
-app.use(errors());
+app.use(errorLogger); // подключаем логгер ошибок
+app.use(errors()); // обработчик ошибок celebrate
 app.use(handleError);
 
 app.listen(PORT, () => {
